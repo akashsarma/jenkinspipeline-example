@@ -2,25 +2,31 @@ pipeline {
     agent { label 'LAB-windows-EV' }
 
     parameters {
-        choice(
-            name: 'SERVER',
-            choices: ['PPG-App01', 'PPG-App02'],
-            description: 'Select remote Windows server'
-        )
+        choice(name: 'SERVER', choices: ['PPG-App01', 'PPG-App02'])
     }
 
     stages {
-        stage('Run PowerShell Script') {
+
+        stage('Copy Script to Remote Server') {
             steps {
                 powershell """
-                # Optional: If using credentials stored in Jenkins
-                # \$cred = Get-Credential
+                \$remotePath = "C:\\\\Temp\\\\day1.ps1"
 
+                Copy-Item `
+                    -Path "day1.ps1" `
+                    -Destination "\\\\${params.SERVER}\\\\C$\\\\Temp" `
+                    -Force
+                """
+            }
+        }
+
+        stage('Run Remote Script') {
+            steps {
+                powershell """
                 Invoke-Command `
                     -ComputerName ${params.SERVER} `
                     -ScriptBlock {
-                        Write-Host "Running script on remote server: ${params.SERVER}"
-                        & "D:\\\\Jenkins\\\\Agent\\\\workspace\\\\windowsPSwith-git\\\\day1.ps1"
+                        & "C:\\\\Temp\\\\day1.ps1"
                     }
                 """
             }
