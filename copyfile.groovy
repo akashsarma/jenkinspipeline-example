@@ -14,7 +14,7 @@ pipeline {
 
                 Copy-Item `
                     -Path "day1.ps1" `
-                    -Destination "\\\\${params.SERVER}\\\\C$\\\\Temp" `
+                    -Destination "\\\\${params.SERVER}\\\\C\\\$\\\\Temp" `
                     -Force
                 """
             }
