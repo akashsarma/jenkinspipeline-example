@@ -2,32 +2,27 @@ pipeline {
     agent { label 'LAB-windows-EV' }
 
     parameters {
-        choice(name: 'SERVER', choices: ['PPG-App01', 'PPG-App02'])
+        choice(
+            name: 'SERVER',
+            choices: ['PPG-App01', 'PPG-App02'],
+            description: 'Choose server to run script'
+        )
     }
 
     stages {
 
-        stage('Copy Script to Remote Server') {
+        stage('Run Remote PowerShell Script') {
             steps {
                 powershell """
-                \$remotePath = "C:\\\\Temp\\\\day1.ps1"
+                Write-Host "Running script on: ${params.SERVER}"
 
-                Copy-Item `
-                    -Path "day1.ps1" `
-                    -Destination "\\\\${params.SERVER}\\\\C\\\$\\\\Temp" `
-                    -Force
-                """
-            }
-        }
+                # Read PS1 file from workspace
+                \$scriptContent = Get-Content "day1.ps1" -Raw
 
-        stage('Run Remote Script') {
-            steps {
-                powershell """
-                Invoke-Command `
-                    -ComputerName ${params.SERVER} `
-                    -ScriptBlock {
-                        & "C:\\\\Temp\\\\day1.ps1"
-                    }
+                # Execute it remotely
+                Invoke-Command -ComputerName ${params.SERVER} -ScriptBlock {
+                    Invoke-Expression \$using:scriptContent
+                }
                 """
             }
         }
