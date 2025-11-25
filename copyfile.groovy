@@ -11,7 +11,7 @@ pipeline {
                 powershell """
                 Invoke-Command -ComputerName ${params.SERVER} -ScriptBlock {
                     # Run your PS1 file
-                    C:\\jenkins\\scripts\\day1.ps1
+                     D:\\Jenkins\\Agent\\workspace\\windowsPSwith-git\\day1.ps1
                 }
                 """
             }
